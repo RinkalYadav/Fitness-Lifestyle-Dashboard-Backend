@@ -2,18 +2,22 @@ package com.example.fitness.controller;
 
 
 import com.example.fitness.entity.User;
-
+import com.example.fitness.mailservice.OtpService;
 import com.example.fitness.repository.UserRepository;
 import com.example.fitness.security.JwtUtil;
 
 //import com.example.fitness.security.JwtUtil;
 //import com.example.fitness.service.EmailService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.stereotype.Service;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
+
 
 @RestController
 @RequestMapping("/api/auth")
@@ -22,6 +26,8 @@ public class AuthController {
     @Autowired private UserRepository userRepository;
     @Autowired private BCryptPasswordEncoder passwordEncoder;
     @Autowired private JwtUtil jwtUtil;
+    
+    @Autowired private OtpService otpService;
 
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody User user) {
@@ -72,11 +78,12 @@ public class AuthController {
         String otp = String.valueOf(new Random().nextInt(900000) + 100000);
         user.setOtp(otp);
         userRepository.save(user);
+        
+        otpService.sendOtpEmail(email, otp);
 
         // Return OTP in response (instead of sending email)
         return ResponseEntity.ok(Map.of(
-            "message", "OTP generated successfully",
-            "otp", otp
+        		 "message", "OTP sent successfully to your registered email"
         ));
     }
 
