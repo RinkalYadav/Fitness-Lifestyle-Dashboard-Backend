@@ -17,6 +17,29 @@ public class User {
     private String specializations; // Comma-separated list
     private String resetToken;
     private String otp; // For OTP-based password reset
+ // ✅ Correct (wrapper types, can handle null)
+    private Integer age;
+    private Integer height;
+    private Integer weight;
+
+	public Integer getAge() {
+		return age;
+	}
+	public void setAge(Integer age) {
+		this.age = age;
+	}
+	public Integer getHeight() {
+		return height;
+	}
+	public void setHeight(Integer height) {
+		this.height = height;
+	}
+	public Integer getWeight() {
+		return weight;
+	}
+	public void setWeight(Integer weight) {
+		this.weight = weight;
+	}
 	public Long getId() {
 		return id;
 	}
