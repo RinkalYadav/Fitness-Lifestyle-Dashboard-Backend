@@ -47,17 +47,26 @@ public class AuthController {
 
         User foundUser = userRepository.findByNameAndEmail(name, email);
         if (foundUser == null || !passwordEncoder.matches(password, foundUser.getPassword())) {
-            return ResponseEntity.status(403).body("Invalid credentials");
+            return ResponseEntity.status(403).body(Map.of("message", "Invalid credentials"));
         }
 
+        // Generate JWT token
         String token = jwtUtil.generateToken(foundUser.getName(), foundUser.getRole());
+
+        // Return full user data including id
         return ResponseEntity.ok(Map.of(
-                "token", token,
-                "name", foundUser.getName(),
-                "role", foundUser.getRole(),
-                "specializations", foundUser.getSpecializations()
+            "id", foundUser.getId(),
+            "name", foundUser.getName(),
+            "email", foundUser.getEmail(),
+            "role", foundUser.getRole(),
+            "specializations", foundUser.getSpecializations(),
+            "age", foundUser.getAge(),
+            "height", foundUser.getHeight(),
+            "weight", foundUser.getWeight(),
+            "token", token
         ));
     }
+
 
     @PostMapping("/forgot-password")
     public ResponseEntity<?> forgotPassword(@RequestBody Map<String, String> request) {
