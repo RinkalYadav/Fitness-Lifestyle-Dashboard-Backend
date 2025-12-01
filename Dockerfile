@@ -1,27 +1,25 @@
-# --------------------------------
-# Stage 1: Build the Spring Boot JAR
-# --------------------------------
-FROM maven:3.8.6-eclipse-temurin-17 as build
-
-WORKDIR /app
-
-# Copy entire repository into container
-COPY . .
-
-# Build the project inside FitnessApp folder
-RUN mvn -f FitnessApp/pom.xml clean package -DskipTests
-
-
-# --------------------------------
-# Stage 2: Run the Spring Boot app
-# --------------------------------
+# Use Java 17 (required for Spring Boot)
 FROM eclipse-temurin:17-jdk-alpine
 
+# Working directory inside the container
 WORKDIR /app
 
-# Copy the JAR file from the first stage
-COPY --from=build /app/FitnessApp/target/*.jar app.jar
+# Copy Maven wrapper and pom.xml
+COPY .mvn/ .mvn
+COPY mvnw .
+COPY pom.xml .
 
+# Download dependencies (helps in faster builds)
+RUN ./mvnw dependency:go-offline
+
+# Copy source code
+COPY src ./src
+
+# Build the application
+RUN ./mvnw package -DskipTests
+
+# Expose backend port
 EXPOSE 8080
 
-ENTRYPOINT ["java", "-jar", "app.jar"]
+# Run the packaged JAR file
+CMD ["java", "-jar", "target/*.jar"]
