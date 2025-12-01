@@ -1,26 +1,23 @@
-# Use official Maven image to build the code
-FROM maven:3.8.6-openjdk-17 AS build
-
-# Set working directory
-WORKDIR /app
-
-# Copy the project
-COPY . .
-
-# Go inside FitnessApp folder and build
-RUN mvn -f FitnessApp/pom.xml clean package -DskipTests
-
-
-# Run stage
-FROM openjdk:17-jdk-slim
+# Use Java 17 (correct and supported)
+FROM eclipse-temurin:17-jdk-alpine
 
 WORKDIR /app
 
-# Copy built JAR from previous stage
-COPY --from=build /app/FitnessApp/target/*.jar app.jar
+# Copy Maven wrapper and project files
+COPY .mvn/ .mvn
+COPY mvnw .
+COPY pom.xml .
 
-# Expose port
+# Pre-download dependencies (faster builds)
+RUN ./mvnw dependency:go-offline
+
+# Copy source code
+COPY src ./src
+
+# Build project
+RUN ./mvnw package -DskipTests
+
 EXPOSE 8080
 
-# Start Spring Boot application
-ENTRYPOINT ["java", "-jar", "app.jar"]
+# Run the jar file
+CMD ["java", "-jar", "target/*.jar"]
