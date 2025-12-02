@@ -25,7 +25,7 @@ public class SecurityConfig {
             .csrf().disable()
             .authorizeHttpRequests(auth -> auth
                     .requestMatchers("/api/auth/**").permitAll()   // Allow login/register
-                    .anyRequest().authenticated()                  // Protect all other APIs
+                    .anyRequest().authenticated()                  // Secure all other endpoints
             )
             .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
@@ -42,10 +42,10 @@ public class SecurityConfig {
 
         CorsConfiguration config = new CorsConfiguration();
 
-        // ⭐ Must use allowedOriginPatterns for Render + Netlify
+        // ⭐ MUST use allowedOriginPatterns for Render + Netlify
         config.setAllowedOriginPatterns(Arrays.asList(
-                "https://fitnessdashboard1.netlify.app",
-                "http://localhost:4200"
+                "https://fitnessdashboard1.netlify.app",   // Production
+                "http://localhost:4200"                    // Development
         ));
 
         config.setAllowedMethods(Arrays.asList(
@@ -54,7 +54,7 @@ public class SecurityConfig {
 
         config.setAllowedHeaders(Arrays.asList("*"));
 
-        // ⭐ FIX: allow sending Authorization: Bearer token
+        // ⭐ REQUIRED FOR JWT TOKEN USAGE
         config.setExposedHeaders(Arrays.asList("Authorization"));
 
         config.setAllowCredentials(true);
