@@ -57,6 +57,7 @@ public class SecurityConfig {
         // ⭐ REQUIRED FOR JWT TOKEN USAGE
         config.setExposedHeaders(Arrays.asList("Authorization"));
 
+
         config.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
