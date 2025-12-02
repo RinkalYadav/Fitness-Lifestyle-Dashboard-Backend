@@ -24,8 +24,8 @@ public class SecurityConfig {
             .cors().and()
             .csrf().disable()
             .authorizeHttpRequests(auth -> auth
-                    .requestMatchers("/api/auth/**").permitAll()
-                    .anyRequest().authenticated()
+                    .requestMatchers("/api/auth/**").permitAll()   // Allow login/register
+                    .anyRequest().authenticated()                  // Protect all other APIs
             )
             .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
@@ -37,22 +37,32 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
+    // CORRECT CORS CONFIG FOR RENDER + NETLIFY
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
+
         CorsConfiguration config = new CorsConfiguration();
 
-        // 🔥 IMPORTANT — ADD YOUR FRONTEND NETLIFY URL HERE
+        // IMPORTANT — YOUR REAL FRONTEND URL
         config.setAllowedOrigins(Arrays.asList(
-                "http://localhost:4200",
-                "https://your-frontend.netlify.app"
+                "https://fitnessdashboard1.netlify.app",   // Production frontend
+                "http://localhost:4200"                    // Local Angular
         ));
 
-        config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        // Allow specific HTTP methods
+        config.setAllowedMethods(Arrays.asList(
+                "GET", "POST", "PUT", "DELETE", "OPTIONS"
+        ));
+
+        // Allow all headers (Authorization, Content-Type, etc)
         config.setAllowedHeaders(Arrays.asList("*"));
+
+        // Allow cookies / Authorization header
         config.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);
+
         return source;
     }
 }
