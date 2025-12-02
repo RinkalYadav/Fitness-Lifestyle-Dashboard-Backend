@@ -37,16 +37,15 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
-    // ⭐ FINAL CORRECT CORS CONFIG FOR RENDER + NETLIFY (100% WORKING)
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
 
         CorsConfiguration config = new CorsConfiguration();
 
-        // ⭐ USE allowedOriginPatterns (NOT allowedOrigins)
+        // ⭐ Must use allowedOriginPatterns for Render + Netlify
         config.setAllowedOriginPatterns(Arrays.asList(
-                "https://fitnessdashboard1.netlify.app",  // Your production frontend
-                "http://localhost:4200"                   // Local frontend for development
+                "https://fitnessdashboard1.netlify.app",
+                "http://localhost:4200"
         ));
 
         config.setAllowedMethods(Arrays.asList(
@@ -55,7 +54,9 @@ public class SecurityConfig {
 
         config.setAllowedHeaders(Arrays.asList("*"));
 
-        // Required for Authorization: Bearer token
+        // ⭐ FIX: allow sending Authorization: Bearer token
+        config.setExposedHeaders(Arrays.asList("Authorization"));
+
         config.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
